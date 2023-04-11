@@ -15,6 +15,8 @@ import time
 from tqdm import tqdm
 
 
+UPGRADE_DOCS = "https://github.com/canonical/bundle-kubeflow/tree/main/docs"
+
 # Table style print
 def pprint(d):
     temp = []
@@ -33,7 +35,7 @@ def pprint_upgrades(d):
     temp = []
     for k,v in d.items():
         temp.append([k] + [v2 for v2 in v.values()])
-    print(tab(temp, headers=["Charm", "Src Channel", "S", "Dst Channel", "Src Revision", "S", "Dst Revision"]))
+    print(tab(temp, headers=["Charm", "Src Channel", "S", "Dst Channel", "Src Rev", "S", "Dst Rev"]))
 
 
 # Transform the juju bundle yaml to a dict that maps
@@ -132,6 +134,7 @@ def upgrade_flagger(source, target):
         print(f"{len(apps_to_remove)} charms not found in target bundle: {apps_to_remove}")
 
     check_downgrade(source, target)
+    print(f"Also check upgrade docs at {UPGRADE_DOCS} for any relevant steps!")
 
 
 # function to query charmhub with juju to get version numbers for apps
@@ -246,6 +249,7 @@ if __name__ == '__main__':
 
     if target_version == "self":
         target_version = local_version
+        print(f"Inferring local version for target version as: {target_version}")
 
     if not target_version:
         print("Unable to get target version")
