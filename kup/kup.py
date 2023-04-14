@@ -30,6 +30,7 @@ class kup:
         self.target_version = None
         self.format = None
         self.output_file = None
+        self.second_file = None
 
 
     def _print(self, output, csv_flag=False):
@@ -272,6 +273,8 @@ class kup:
             "-f",
             "--file",
             help="Input juju kubeflow bundle yaml",
+            action="append",
+            nargs='+',
         )
         parser.add_argument(
             "-t",
@@ -291,8 +294,15 @@ class kup:
         )
         # create args
         args = parser.parse_args()
-        self.file = args.file
         self.target_version = args.target
+        if args.file:
+            self.file = args.file[0][0]
+            if len(args.file) == 2:
+                self.target_version = -1
+                self.second_file = args.file[1][0]
+            elif len(args.file) > 2:
+                print("Too many files!")
+                exit()
         self.format = args.format
         self.output_file = args.output
 
@@ -319,11 +329,17 @@ if __name__ == '__main__':
     if not kupObj.target_version:
         print("Unable to get target version")
         exit()
-    # get target bundle
-    target_bundle = kupObj.download_bundle(kupObj.target_version)
-    if not target_bundle:
-        exit()
-    charm_version_dict_target, kupObj.target_version = kupObj.transform(target_bundle, get_revision=True)
+    
+    if kupObj.target_version == -1:
+        # get second local bundle file
+        target_bundle = kupObj.load_bundle(kupObj.file)
+        charm_version_dict_target, kupObj.target_version = kupObj.transform(target_bundle)
+    else:
+        # get target bundle
+        target_bundle = kupObj.download_bundle(kupObj.target_version)
+        if not target_bundle:
+            exit()
+        charm_version_dict_target, kupObj.target_version = kupObj.transform(target_bundle, get_revision=True)
     if not kupObj.file:
         kupObj.pprint(charm_version_dict_target)
         exit()
