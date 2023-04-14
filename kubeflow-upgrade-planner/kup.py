@@ -13,9 +13,11 @@ from uuid import uuid4 as uid
 from textwrap import dedent
 import time
 from tqdm import tqdm
+from termcolor import colored
 
 
 UPGRADE_DOCS = "https://github.com/canonical/bundle-kubeflow/tree/main/docs"
+# GREEN = "\033[1;32m "
 
 # Table style print
 def pprint(d):
@@ -35,6 +37,8 @@ def pprint_upgrades(d):
     temp = []
     for k,v in d.items():
         temp.append([k] + [v2 for v2 in v.values()])
+        if '->' in temp[-1]:
+           temp[-1] = [colored(str(i), 'green') if i else i for i in temp[-1]]
     print(tab(temp, headers=["Charm", "Src Channel", "S", "Dst Channel", "Src Rev", "S", "Dst Rev"]))
 
 
