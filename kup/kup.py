@@ -298,6 +298,10 @@ class kup:
         # create args
         args = parser.parse_args()
         self.target_version = args.target
+        if len(args.file) == 2 and self.target_version:
+            print("When checking for upgrade choose one of:")
+            print("Two local bundles, 1 local 1 remote bundle")
+            exit()
         if args.file:
             self.file = args.file[0][0]
             if len(args.file) == 2:
