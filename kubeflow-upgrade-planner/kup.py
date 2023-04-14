@@ -29,23 +29,48 @@ class kup:
         self.file = None
         self.target_version = None
         self.format = None
+        self.output_file = None
+
+
+    def _print(self, output, csv_flag=False):
+        if not self.output_file:
+            if csv_flag:
+                writer = csv.writer(sys.stdout)
+                writer.writerows(output)
+            else:
+                print(output)
+        else:
+            # check validity of file
+            if '/' in self.output_file:
+                path = self.output_file.split('/')
+                path = "/".join(path[:-1])
+                if not os.path.exists(self.output_file):
+                    print(f"Invalid path {path}")
+                    return
+            with open(self.output_file, 'w') as f:
+                if csv_flag:
+                    writer = csv.writer(f)
+                    writer.writerows(output)
+                else:
+                    f.write(output)
 
 
     # Styled print with optional upgrade markers
     # Supports table, yaml, json and csv 
     def pprint(self, d, upgrades=False):
         if self.format == "yaml":
-            print(yaml.dump(d))
+            self._print(yaml.dump(d))
         elif self.format == "json":
-            print(json.dumps(d))
+            self._print(json.dumps(d))
         else:
             temp = []
             if upgrades:
                 fields = ["Charm", "Src Channel", "S", "Dst Channel", "Src Rev", "S", "Dst Rev"]
                 for k,v in d.items():
                     temp.append([k] + [v2 for v2 in v.values()])
-                    if '->' in temp[-1]:
-                        temp[-1] = [colored(str(i), 'green') if i else i for i in temp[-1]]
+                    if not self.output_file:
+                        if '->' in temp[-1]:
+                            temp[-1] = [colored(str(i), 'green') if i else i for i in temp[-1]]
             else:
                 fields = ["Charm", "Channel", "Revision"]
                 for k,v in d.items():
@@ -55,10 +80,9 @@ class kup:
                             temp2.extend([v2])
                     temp.append(temp2)
             if self.format == "csv":   
-                writer = csv.writer(sys.stdout, lineterminator=os.linesep)
-                writer.writerows([fields] + temp)
+                self._print([fields] + temp, csv_flag=True)
             else:
-                print(tab(temp, headers=fields))
+                self._print(tab(temp, headers=fields))
 
 
     # Transform the juju bundle yaml to a dict that maps
@@ -244,11 +268,15 @@ class kup:
                 for upgrade is run.
             ''')
         )
-        parser.add_argument("-f", "--file", help="Input juju kubeflow bundle yaml")
+        parser.add_argument(
+            "-f",
+            "--file",
+            help="Input juju kubeflow bundle yaml",
+        )
         parser.add_argument(
             "-t",
             "--target",
-            help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or 1.7/edge"
+            help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or 1.7/edge",
         )
         parser.add_argument(
             "--format",
@@ -256,12 +284,17 @@ class kup:
             choices=self.output_formats,
             type=str.lower,
         )
+        parser.add_argument(
+            "-o",
+            "--output",
+            help="File to store output",
+        )
         # create args
         args = parser.parse_args()
         self.file = args.file
         self.target_version = args.target
         self.format = args.format
-
+        self.output_file = args.output
 
 
 if __name__ == '__main__':
