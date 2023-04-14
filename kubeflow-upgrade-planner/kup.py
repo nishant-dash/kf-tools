@@ -13,6 +13,9 @@ from uuid import uuid4 as uid
 from textwrap import dedent
 from tqdm import tqdm
 from termcolor import colored
+import json
+import csv
+import sys
 
 
 class kup:
@@ -22,27 +25,40 @@ class kup:
         self.anchor_app = "kubeflow-dashboard"
         self.index = {"beta": 0, "stable": 1, "edge": 2}
         self.juju = "/snap/bin/juju"
-
-    # Table style print
-    def pprint(self, d):
-        temp = []
-        for k,v in d.items():
-            temp2 = [k]
-            for k2, v2 in v.items():
-                if k2 != "charm_name":
-                    temp2.extend([v2])
-            temp.append(temp2)
-        print(tab(temp, headers=["Charm", "Channel", "Revision"]))
+        self.output_formats = ["yaml", "json", "csv"]
+        self.file = None
+        self.target_version = None
+        self.format = None
 
 
-    # Table style print with upgrade markers
-    def pprint_upgrades(self, d):
-        temp = []
-        for k,v in d.items():
-            temp.append([k] + [v2 for v2 in v.values()])
-            if '->' in temp[-1]:
-                temp[-1] = [colored(str(i), 'green') if i else i for i in temp[-1]]
-        print(tab(temp, headers=["Charm", "Src Channel", "S", "Dst Channel", "Src Rev", "S", "Dst Rev"]))
+    # Styled print with optional upgrade markers
+    # Supports table, yaml, json and csv 
+    def pprint(self, d, upgrades=False):
+        if self.format == "yaml":
+            print(yaml.dump(d))
+        elif self.format == "json":
+            print(json.dumps(d))
+        else:
+            temp = []
+            if upgrades:
+                fields = ["Charm", "Src Channel", "S", "Dst Channel", "Src Rev", "S", "Dst Rev"]
+                for k,v in d.items():
+                    temp.append([k] + [v2 for v2 in v.values()])
+                    if '->' in temp[-1]:
+                        temp[-1] = [colored(str(i), 'green') if i else i for i in temp[-1]]
+            else:
+                fields = ["Charm", "Channel", "Revision"]
+                for k,v in d.items():
+                    temp2 = [k]
+                    for k2, v2 in v.items():
+                        if k2 != "charm_name":
+                            temp2.extend([v2])
+                    temp.append(temp2)
+            if self.format == "csv":   
+                writer = csv.writer(sys.stdout, lineterminator=os.linesep)
+                writer.writerows([fields] + temp)
+            else:
+                print(tab(temp, headers=fields))
 
 
     # Transform the juju bundle yaml to a dict that maps
@@ -128,7 +144,7 @@ class kup:
                 final_dict[charm]["channel_upgrade"] = "+"
                 final_dict[charm]["revision_upgrade"] = "+"
 
-        self.pprint_upgrades(final_dict)
+        self.pprint(final_dict, upgrades=True)
         print(f"\n{num_changes} charms need upgrades!")
 
         apps_to_remove = []
@@ -210,64 +226,72 @@ class kup:
         return bundle
 
 
-# Initialize and load script arguments
-def arg_loader():
-    parser = argparse.ArgumentParser(
-        # epilog="Tool to view kubeflow bundles and compare 2 bundles for possible upgrades"
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=dedent('''\
-        Additional information:
-            To view a local bundle, you can extract it with
-            "juju export-bundle > filename" and then pass it to the tool as:
-            kubeflow-upgrade-planner -s filename
+    # Initialize and load script arguments
+    def load_args(self):
+        parser = argparse.ArgumentParser(
+            # epilog="Tool to view kubeflow bundles and compare 2 bundles for possible upgrades"
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            epilog=dedent('''\
+            Additional information:
+                To view a local bundle, you can extract it with
+                "juju export-bundle > filename" and then pass it to the tool as:
+                kubeflow-upgrade-planner -s filename
 
-            To view bundle from the git repo, just run with only the "-t" flag
-            and then a channel after it.
-            
-            When both local and target bundles are provided, an automatic check
-            for upgrade is run.
-        ''')
-    )
-    parser.add_argument("-f", "--file", help="Input juju kubeflow bundle yaml")
-    parser.add_argument(
-        "-t",
-        "--target",
-        help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or 1.7/edge"
-    )
-    # create args
-    args = parser.parse_args()
-    return args.file, args.target
+                To view bundle from the git repo, just run with only the "-t" flag
+                and then a channel after it.
+                
+                When both local and target bundles are provided, an automatic check
+                for upgrade is run.
+            ''')
+        )
+        parser.add_argument("-f", "--file", help="Input juju kubeflow bundle yaml")
+        parser.add_argument(
+            "-t",
+            "--target",
+            help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or 1.7/edge"
+        )
+        parser.add_argument(
+            "--format",
+            help="Output format, can be yaml, json or csv",
+            choices=self.output_formats,
+            type=str.lower,
+        )
+        # create args
+        args = parser.parse_args()
+        self.file = args.file
+        self.target_version = args.target
+        self.format = args.format
 
 
 
 if __name__ == '__main__':
-    # get args
-    file, target_version = arg_loader()
-
     # instantiate kup object
     kupObj = kup()
+
+    # get args
+    kupObj.load_args()
     local_version = None
-    if file:
+    if kupObj.file:
         # get local bundle
-        local_bundle = kupObj.load_bundle(file)
+        local_bundle = kupObj.load_bundle(kupObj.file)
         charm_version_dict, local_version = kupObj.transform(local_bundle)
-        if not target_version:
+        if not kupObj.target_version:
             kupObj.pprint(charm_version_dict)
             exit()
 
-    if target_version == "self":
-        target_version = local_version
-        print(f"Inferring local version for target version as: {target_version}")
+    if kupObj.target_version == "self":
+        kupObj.target_version = local_version
+        print(f"Inferring local version for target version as: {kupObj.target_version}")
 
-    if not target_version:
+    if not kupObj.target_version:
         print("Unable to get target version")
         exit()
     # get target bundle
-    target_bundle = kupObj.download_bundle(target_version)
+    target_bundle = kupObj.download_bundle(kupObj.target_version)
     if not target_bundle:
         exit()
-    charm_version_dict_target, target_version = kupObj.transform(target_bundle, get_revision=True)
-    if not file:
+    charm_version_dict_target, kupObj.target_version = kupObj.transform(target_bundle, get_revision=True)
+    if not kupObj.file:
         kupObj.pprint(charm_version_dict_target)
         exit()
 
