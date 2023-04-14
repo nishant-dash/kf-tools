@@ -259,7 +259,7 @@ class kup:
             Additional information:
                 To view a local bundle, you can extract it with
                 "juju export-bundle > filename" and then pass it to the tool as:
-                kubeflow-upgrade-planner -s filename
+                kup -s filename
 
                 To view bundle from the git repo, just run with only the "-t" flag
                 and then a channel after it.
