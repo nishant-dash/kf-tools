@@ -272,7 +272,10 @@ class kup:
         parser.add_argument(
             "-f",
             "--file",
-            help="Input juju kubeflow bundle yaml",
+            help=dedent('''\
+                Input juju kubeflow bundle yaml, can specify 2 local files
+                using this same flag, treating first file as src for diff
+            '''),
             action="append",
             nargs='+',
         )
