@@ -20,7 +20,9 @@ class kup:
     def __init__(self):
         self.kf_source = "https://github.com/canonical/bundle-kubeflow"
         self.upgrade_docs = f"{self.kf_source}/tree/main/docs"
-        return
+        self.anchor_app = "kubeflow-dashboard"
+        self.index = {"beta": 0, "stable": 1, "edge": 2}
+        self.juju = "/snap/bin/juju"
 
     # Table style print
     def pprint(self, d):
@@ -59,28 +61,26 @@ class kup:
                 charm_version_dict[charm] = {"channel": info["channel"], "charm_name": info["charm"]}
             self.get_reversion_numbers(charm_version_dict)
 
-        return charm_version_dict , charm_version_dict["kubeflow-dashboard"]["channel"]
+        return charm_version_dict , charm_version_dict[self.anchor_app]["channel"]
 
 
     # hacky function to check downgrade
     def check_downgrade(self, source, target):
-        index = {"beta": 0, "stable": 1, "edge": 2,}
-        anchor_app = "kubeflow-dashboard"
-        src = source[anchor_app]
-        dst = target[anchor_app]
+        src = source[self.anchor_app]
+        dst = target[self.anchor_app]
         src_channel, src_mode = src["channel"].split("/")
         dst_channel, dst_mode = dst["channel"].split("/")
 
         # if dst_channel == "latest":
         #     if src_channel == "latest":
-        #         if index[dst_mode] < index[src_mode]:
+        #         if self.index[dst_mode] < self.index[src_mode]:
         #             print("Downgrade detected!")
         #             return True
         if float(dst_channel) < float(src_channel):
             print("Downgrade detected!")
             return True
         elif dst_channel == src_channel:
-            if index[dst_mode] < index[src_mode]:
+            if self.index[dst_mode] < self.index[src_mode]:
                 print("Downgrade detected!")
                 return True
         elif int(dst["revision"]) < int(src["revision"]):
@@ -148,7 +148,7 @@ class kup:
         # before we can return target bundle, we need to get revision numbers from
         # charmhub. Currently, the kf bundle in the git repo does not include such
         # information.
-        if not os.path.exists("/snap/bin/juju"):
+        if not os.path.exists(self.juju):
             print("Can't find juju snap! Need that to query charmhub")
             return None
 
@@ -158,7 +158,7 @@ class kup:
             # temp file for the bundle
             temp_file = f"/tmp/temp-{charm}-info-{uid()}.yaml"
             # get the juju info as yaml
-            cmd = ["/snap/bin/juju", "info", info["charm_name"], "--format", "yaml", "-o", temp_file]
+            cmd = [self.juju, "info", info["charm_name"], "--format", "yaml", "-o", temp_file]
             sp.run(cmd, stderr=sp.DEVNULL)
             # print(" ". join(cmd))
             # parse yaml for what we need
