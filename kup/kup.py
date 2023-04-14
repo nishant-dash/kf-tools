@@ -295,6 +295,9 @@ class kup:
             "--output",
             help="File to store output",
         )
+        # @TODO
+        # add arg for generating action plans
+        # and clean up output formatting
         # create args
         args = parser.parse_args()
         self.target_version = args.target
