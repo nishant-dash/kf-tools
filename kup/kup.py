@@ -282,7 +282,7 @@ class kup:
         parser.add_argument(
             "-t",
             "--target",
-            help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or 1.7/edge",
+            help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or self",
         )
         parser.add_argument(
             "--format",
