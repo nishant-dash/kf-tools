@@ -52,22 +52,22 @@ kpl grep -iE 'error|block|fail|lost|timeout'
 kup
 
 # view a local bundle
-kup -s my-kf-bundle.yaml
+kup -f my-kf-bundle.yaml
 
 # view a remote bundle
 kup -t 1.7/stable
 
 # compare a local and remote bundle
-kup -s my-kf-bundle.yaml -t 1.7/stable
+kup -f my-kf-bundle.yaml -t 1.7/stable
 
 # compare two local bundles
-kup -s my-kf-bundle.yaml -s my-kf-bundle2.yaml
+kup -f my-kf-bundle.yaml -f my-kf-bundle2.yaml
 
 # compare two local bundles and get a yaml/json output
-kup -s my-kf-bundle.yaml -s my-kf-bundle2.yaml --format yaml
+kup -f my-kf-bundle.yaml -f my-kf-bundle2.yaml --format yaml
 
 # generate an action plan based on the differences
-kup -s my-kf-bundle.yaml -t 1.7/stable --generate-ap
+kup -f my-kf-bundle.yaml -t 1.7/stable --generate-ap
 ```
 
 ### kvs
