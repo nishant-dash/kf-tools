@@ -11,7 +11,6 @@ import subprocess as sp
 import os
 from uuid import uuid4 as uid
 from textwrap import dedent
-import time
 from tqdm import tqdm
 from termcolor import colored
 
