@@ -1,10 +1,9 @@
-alias kf='kubectl -n kubeflow'
+kf='kubectl -n kubeflow'
 # function for fuzzy finding pods
 function kp {
   pattern="${@:-.}"
   kf get po | grep -iE $pattern | fzf
 }
-export -f kp
 # function for viewing logs with specified tool (default uses less)
 # example: kpl less, kpl view, kpl less +G, etc...
 # Also, can append any command after kpl that operates on a file like grep, sec, etc...
