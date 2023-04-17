@@ -1,3 +1,4 @@
+#!/bin/bash
 kf='kubectl -n kubeflow'
 # function for fuzzy finding pods
 function kp {
