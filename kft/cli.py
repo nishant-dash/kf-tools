@@ -1,7 +1,7 @@
 import click
 from kf_upgrade_planner import kup as kup
 from kf_image_scanner import kvs
-
+import sys
 
 @click.group()
 def cli():
@@ -9,6 +9,17 @@ def cli():
     A collection of handy tools for operators of kubeflow environments
     '''
     pass
+
+
+@cli.command(
+    name="logs",
+    help="view kf pod logs using fzf to navigate",
+)
+@click.argument('args', nargs=-1)
+def kpl_main(args):
+    print(args)
+    print(sys.argv[1:])
+    return
 
 
 epilog_check = '''
