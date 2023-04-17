@@ -19,18 +19,18 @@ import sys
 
 
 class kup:
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.kf_source = "https://github.com/canonical/bundle-kubeflow"
         self.upgrade_docs = f"{self.kf_source}/tree/main/docs"
         self.anchor_app = "kubeflow-dashboard"
         self.index = {"beta": 0, "stable": 1, "edge": 2}
         self.juju = "/snap/bin/juju"
         self.output_formats = ["yaml", "json", "csv"]
-        self.file = None
-        self.target_version = None
-        self.format = None
-        self.output_file = None
-        self.second_file = None
+        self.file = kwargs["file"]
+        self.target_version = kwargs["target_version"]
+        self.format = kwargs["formatting"]
+        self.output_file = kwargs["output_file"]
+        self.second_file = kwargs["second_file"]
 
 
     def _print(self, output, csv_flag=False):
@@ -251,78 +251,84 @@ class kup:
         return bundle
 
 
-    # Initialize and load script arguments
-    def load_args(self):
-        parser = argparse.ArgumentParser(
-            # epilog="Tool to view kubeflow bundles and compare 2 bundles for possible upgrades"
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-            epilog=dedent('''\
-            Additional information:
-                To view a local bundle, you can extract it with
-                "juju export-bundle > filename" and then pass it to the tool as:
-                kup -s filename
+# Initialize and load script arguments
+def load_args():
+    parser = argparse.ArgumentParser(
+        # epilog="Tool to view kubeflow bundles and compare 2 bundles for possible upgrades"
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=dedent('''\
+        Additional information:
+            To view a local bundle, you can extract it with
+            "juju export-bundle > filename" and then pass it to the tool as:
+            kup -s filename
 
-                To view bundle from the git repo, just run with only the "-t" flag
-                and then a channel after it.
-                
-                When both local and target bundles are provided, an automatic check
-                for upgrade is run.
-            ''')
-        )
-        parser.add_argument(
-            "-f",
-            "--file",
-            help=dedent('''\
-                Input juju kubeflow bundle yaml, can specify 2 local files
-                using this same flag, treating first file as src for diff
-            '''),
-            action="append",
-            nargs='+',
-        )
-        parser.add_argument(
-            "-t",
-            "--target",
-            help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or self",
-        )
-        parser.add_argument(
-            "--format",
-            help="Output format, can be yaml, json or csv",
-            choices=self.output_formats,
-            type=str.lower,
-        )
-        parser.add_argument(
-            "-o",
-            "--output",
-            help="File to store output",
-        )
-        # @TODO
-        # add arg for generating action plans
-        # and clean up output formatting
-        # create args
-        args = parser.parse_args()
-        self.target_version = args.target
-        if len(args.file) == 2 and self.target_version:
-            print("When checking for upgrade choose one of:")
-            print("Two local bundles, 1 local 1 remote bundle")
+            To view bundle from the git repo, just run with only the "-t" flag
+            and then a channel after it.
+            
+            When both local and target bundles are provided, an automatic check
+            for upgrade is run.
+        ''')
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        help=dedent('''\
+            Input juju kubeflow bundle yaml, can specify 2 local files
+            using this same flag, treating first file as src for diff
+        '''),
+        action="append",
+        nargs='+',
+    )
+    parser.add_argument(
+        "-t",
+        "--target",
+        help="Target version of kubeflow bundle, ex: 1.7/stable, 1.7/beta or self",
+    )
+    parser.add_argument(
+        "--format",
+        help="Output format, can be yaml, json or csv",
+        choices=["yaml", "json", "csv"],
+        type=str.lower,
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="File to store output",
+    )
+    # @TODO
+    # add arg for generating action plans
+    # and clean up output formatting
+    # create args
+    args = parser.parse_args()
+    obj = {
+        "target_version": args.target,
+        "file": None,
+        "second_file": None,
+        "formatting": args.format,
+        "output_file": args.output,
+    }
+    if len(args.file) == 2 and obj["target_version"]:
+        print("When checking for upgrade choose one of:")
+        print("Two local bundles, 1 local 1 remote bundle")
+        exit()
+    if args.file:
+        obj["file"] = args.file[0][0]
+        if len(args.file) == 2:
+            obj["target_version"] = -1
+            obj["second_file"] = args.file[1][0]
+        elif len(args.file) > 2:
+            print("Too many files!")
             exit()
-        if args.file:
-            self.file = args.file[0][0]
-            if len(args.file) == 2:
-                self.target_version = -1
-                self.second_file = args.file[1][0]
-            elif len(args.file) > 2:
-                print("Too many files!")
-                exit()
-        self.format = args.format
-        self.output_file = args.output
+    return obj
 
 
 if __name__ == '__main__':
-    # instantiate kup object
-    kupObj = kup()
-
     # get args
-    kupObj.load_args()
+    args = load_args()
+
+    # instantiate kup object
+    kupObj = kup(**args)
+
     local_version = None
     if kupObj.file:
         # get local bundle
