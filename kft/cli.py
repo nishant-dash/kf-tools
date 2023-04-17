@@ -1,5 +1,6 @@
 import click
 from kf_upgrade_planner import kup as kup
+from kf_image_scanner import kvs
 
 
 @click.group()
@@ -117,6 +118,54 @@ def kup_main(file, target, formatting, output):
 
     # print upgrade opportunities
     kupObj.upgrade_flagger(source=charm_version_dict, target=charm_version_dict_target)
+
+
+
+@cli.command(
+    name="scan",
+    help="Scan pod images against aquasec\'s CVE database",
+    epilog="Either attemp a local scan, provide an image or a file of image names"
+)
+@click.option(
+    "-i",
+    "--image",
+    help="name of a container image",
+    metavar="<image_name>",
+)
+@click.option(
+    "-f",
+    "--file",
+    help="file containing a list of container image names",
+    metavar="<file>",
+)
+@click.option(
+    "--format",
+    "formatting",
+    help="Output format, can be yaml, json or csv",
+    type=click.Choice(["yaml", "json"]),
+)
+@click.option(
+    "-o",
+    "--output",
+    help="File to store output",
+    metavar="<output_file>",
+)
+@click.option(
+    "-w",
+    "--watch",
+    help="Watch as scan results for each come in one by one",
+    show_default=True,
+    default=False,
+    is_flag=True,
+)
+def kvs_main(image, file, formatting, output, watch):
+    kvs_obj = kvs(formatting, output, watch)
+    if image:
+        kvs_obj.scan([image])
+    if file:
+        images_list = kvs_obj.load_file(file)
+        kvs_obj.scan(images_list)
+    kvs_obj.print_report()
 
 
 if __name__ == "__main__":
