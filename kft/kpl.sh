@@ -20,4 +20,5 @@ function kpl {
   $viewCmd $tempFile
   rm $tempFile
 }
-export -f kpl
+# export -f kpl
+kpl

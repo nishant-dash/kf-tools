@@ -1,7 +1,8 @@
 import click
 from kf_upgrade_planner import kup as kup
 from kf_image_scanner import kvs
-import sys
+import subprocess as sp
+import os
 
 @click.group()
 def cli():
@@ -13,12 +14,28 @@ def cli():
 
 @cli.command(
     name="logs",
-    help="view kf pod logs using fzf to navigate",
+    help='''
+    \b
+    view kf pod logs using fzf to navigate. 
+    Examples:
+    kft logs
+    After logs, specify any quoted string to run as a bash command
+    kft logs less
+    kft logs view
+    kft logs "less +G"
+    kft logs "grep -REi 'err|fail|block|timeout'"
+    ''',
 )
 @click.argument('args', nargs=-1)
 def kpl_main(args):
-    print(args)
-    print(sys.argv[1:])
+    if len(args) > 1:
+        print("Only accept one argument, can be quoted to provide a full bash command with flags")
+    else:
+        args = str(args[0]) if len(args) == 1 else ""
+        executable = os.path.join(os.getcwd(), "kpl.sh")
+        cmd = f"{executable} {args}"
+        print(cmd)
+        sp.run(cmd, shell=True)
     return
 
 
