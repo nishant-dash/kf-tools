@@ -1,5 +1,5 @@
 import click
-from kup import kup as kup
+from kf_upgrade_planner import kup as kup
 
 
 @click.group()
@@ -55,6 +55,15 @@ for upgrade is run. eg: kft check -f localbundle -t 1.7/edge
     help="File to store output",
     metavar="<output_file>",
 )
+# @click.option(
+#     "-g",
+#     "--gen-ap",
+#     "gen_ap",
+#     help="generate AP for upgrades only",
+#     show_default=True,
+#     default=False,
+#     is_flag=True,
+# )
 def kup_main(file, target, formatting, output):
     obj = {
         "target_version": target,
@@ -66,7 +75,7 @@ def kup_main(file, target, formatting, output):
     if file:
         if len(file) == 2 and obj["target_version"]:
             print("When checking for upgrade choose one of:")
-            print("Two local bundles, 1 local 1 remote bundle")
+            print("- Two local bundles,\n- One local One remote bundle")
             exit()
 
         obj["file"] = file[0]
