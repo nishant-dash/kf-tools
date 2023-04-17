@@ -1,12 +1,33 @@
 import click
 from kup import kup as kup
 
+
 @click.group()
 def cli():
+    '''
+    A collection of handy tools for operators of kubeflow environments
+    '''
     pass
 
 
-@cli.command(name='check', help='View kubeflow bundles or compare 2 bundles for possible upgrades')
+epilog_check = '''
+\b
+To view a local bundle, extract it with
+juju export-bundle -o filename
+and then run,
+kft check -f filename
+
+To view bundle from the kubeflow git repo, just run with only the "-t" flag
+and then a channel after it. eg: kft check -t 1.7/stable
+
+When both local and target bundles are provided, an automatic check
+for upgrade is run. eg: kft check -f localbundle -t 1.7/edge
+'''
+@cli.command(
+    name='check',
+    help='View kubeflow bundles or compare 2 bundles for possible upgrades',
+    epilog=epilog_check
+)
 @click.option(
     "-f",
     "--file",
