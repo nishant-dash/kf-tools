@@ -6,14 +6,14 @@
 With kf-tools you have access to a few command line tools to help you operate your kubeflow deployment. These include:
 
 
-1) kpl (Kube Pod Logs viewer)
+1) kft logs (Kube Pod Logs viewer)
 A [fuzzy finder](https://github.com/junegunn/fzf) based utility for navigating pods, and then viewing them with CLI tools such as less, view, or any viewing tool. You can just apply any command after kpl such as grep, etc...
 
-2) kup (Kube Upgrade Planner)
+2) kft check (Kube Upgrade Planner)
 A tool to help you view your juju based kubeflow bundle, in terms of the charm, channel and revision. You can compare 2 local bundles or compare a local with a remote charmed kubeflow bundle and view the differences between these bundles based off their versioning information.
 
-3) kvs (Kube Vulnerability Scanner)
-This scanner uses [trivvy](https://github.com/aquasecurity/trivy) to help you scan your pod images against a databases of known vulnerabilities. It does not scan the container image itself, but for references of CVEs against the image.
+3) kft scan (Kube Vulnerability Scanner)
+This scanner uses [trivy](https://github.com/aquasecurity/trivy) to help you scan your pod images against a databases of known vulnerabilities. It does not scan the container image itself, but for references of CVEs against the image.
 
 
 ## Installation
@@ -28,7 +28,7 @@ sudo snap install kf-tools
 
 You can view all subcommands and flags with `-h` or `--help`.
 
-### kpl
+### kft logs (Kube Pod Logs viewer)
 
 ```bash
 # use it as is
@@ -46,7 +46,7 @@ kft logs "grep -iE 'error|block|fail|lost|timeout'"
 ```
 
 
-### kup
+### kft check (Kube Upgrade Planner)
 
 ```bash
 # run against local environment, this will run juju commands
@@ -68,7 +68,7 @@ kft check -f my-kf-bundle.yaml -f my-kf-bundle2.yaml
 kft check -f my-kf-bundle.yaml -f my-kf-bundle2.yaml --format yaml -o output.yaml
 ```
 
-### kvs
+### kft scan (Kube Vulnerability Scanner)
 
 ```bash
 # scan a particular container image
