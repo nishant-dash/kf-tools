@@ -4,7 +4,6 @@ print rudimentary upgrade path/steps
 '''
 
 import yaml
-import argparse
 from tabulate import tabulate as tab
 import requests
 import subprocess as sp
