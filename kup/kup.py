@@ -222,15 +222,18 @@ class kup:
             sp.run(cmd)
 
     # load target kubeflow bundle from github for comparison
-    def download_bundle(self, target_version):
+    def download_bundle(self):
+        if not self.target_version:
+            print("Unable to get target version")
+            return
         target_bundle = None
-        version, channel = target_version.split("/")
+        version, channel = self.target_version.split("/")
         url = f"{self.kf_source}/raw/main/releases/{version}/{channel}/kubeflow/bundle.yaml"
         response = requests.get(url)
-        print ("Downloading bundle...")
+        print (f"Downloading kf {self.target_version} bundle...")
         if response.status_code != 200:
             response.raise_for_status()
-            print(f"Target bundle for Kubeflow {target_version} not found!")
+            print(f"Target bundle for Kubeflow {self.target_version} not found!")
         else:
             try:
                 target_bundle = yaml.safe_load(response.content)
@@ -307,11 +310,12 @@ def load_args():
         "formatting": args.format,
         "output_file": args.output,
     }
-    if len(args.file) == 2 and obj["target_version"]:
-        print("When checking for upgrade choose one of:")
-        print("Two local bundles, 1 local 1 remote bundle")
-        exit()
     if args.file:
+        if len(args.file) == 2 and obj["target_version"]:
+            print("When checking for upgrade choose one of:")
+            print("Two local bundles, 1 local 1 remote bundle")
+            exit()
+
         obj["file"] = args.file[0][0]
         if len(args.file) == 2:
             obj["target_version"] = -1
@@ -340,11 +344,7 @@ if __name__ == '__main__':
 
     if kupObj.target_version == "self":
         kupObj.target_version = local_version
-        print(f"Inferring local version for target version as: {kupObj.target_version}")
-
-    if not kupObj.target_version:
-        print("Unable to get target version")
-        exit()
+        print(f"Inferring input bundle's version for target version as: {kupObj.target_version}")
     
     if kupObj.target_version == -1:
         # get second local bundle file
@@ -352,7 +352,7 @@ if __name__ == '__main__':
         charm_version_dict_target, kupObj.target_version = kupObj.transform(target_bundle)
     else:
         # get target bundle
-        target_bundle = kupObj.download_bundle(kupObj.target_version)
+        target_bundle = kupObj.download_bundle()
         if not target_bundle:
             exit()
         charm_version_dict_target, kupObj.target_version = kupObj.transform(target_bundle, get_revision=True)
