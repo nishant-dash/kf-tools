@@ -26,11 +26,8 @@ class kup:
         self.index = {"beta": 0, "stable": 1, "edge": 2}
         self.juju = "/snap/bin/juju"
         self.output_formats = ["yaml", "json", "csv"]
-        self.file = kwargs["file"]
-        self.target_version = kwargs["target_version"]
-        self.format = kwargs["formatting"]
-        self.output_file = kwargs["output_file"]
-        self.second_file = kwargs["second_file"]
+        for k,v in kwargs.items():
+            setattr(self, k, v)
 
 
     def _print(self, output, csv_flag=False):
