@@ -31,17 +31,18 @@ You can view all subcommands and flags with `-h` or `--help`.
 ### kpl
 
 ```bash
-# use it as is (default viewer is `less`)
-kpl
+# use it as is
+kft logs
 
-# use it with view
-kpl view
+# use it with less (default) or view
+kft logs less
+kft logs view
 
 # give it some extra flags
-kpl less +G
+kft logs "less +G"
 
 # grep the logs for anything you need
-kpl grep -iE 'error|block|fail|lost|timeout'
+kft logs "grep -iE 'error|block|fail|lost|timeout'"
 ```
 
 
@@ -49,46 +50,47 @@ kpl grep -iE 'error|block|fail|lost|timeout'
 
 ```bash
 # run against local environment, this will run juju commands
-kup
+kft check -l
 
 # view a local bundle
-kup -f my-kf-bundle.yaml
+kft check -f my-kf-bundle.yaml
 
 # view a remote bundle
-kup -t 1.7/stable
+kft check -t 1.7/stable
 
 # compare a local and remote bundle
-kup -f my-kf-bundle.yaml -t 1.7/stable
+kft check -f my-kf-bundle.yaml -t 1.7/stable
 
 # compare two local bundles
-kup -f my-kf-bundle.yaml -f my-kf-bundle2.yaml
+kft check -f my-kf-bundle.yaml -f my-kf-bundle2.yaml
 
 # compare two local bundles and get a yaml/json output
-kup -f my-kf-bundle.yaml -f my-kf-bundle2.yaml --format yaml
-
-# generate an action plan based on the differences
-kup -f my-kf-bundle.yaml -t 1.7/stable --generate-ap
+kft check -f my-kf-bundle.yaml -f my-kf-bundle2.yaml --format yaml -o output.yaml
 ```
 
 ### kvs
 
 ```bash
+# scan a particular container image
+kft scan -i <image_name>
+
+# scan a files of image names 
+kft scan -f <file>
+
+# generate a yaml/json report
+kft scan -f <file> --format json
+
+# watch output as it scans
+kft scan -f <file> -w
+
+# Not Out yet
 # scan current local kubeflow installation that your juju controller has access to 
 # and your kubectl command line tool is configured with
 # this command is namespaced, with the default of kubeflow
-kvs
-
-# generate only summary of severity levels and number of issues at each level
-kvs -s
-
-# generate a complete report of all relevant information like cve numbers, references, etc...
-kvs -r
-
-# generate a yaml/json report
-kvs -r --format json
+kft scan
 
 # scan other namespace(s) or all namespaces (default is kubeflow)
-kvs -n monitoring -s
-kvs -n monitoring,custom,kubeflow -s
-kvs --all-namespaces
+kft scan -n monitoring -s
+kft scan -n monitoring,custom,kubeflow -s
+kft scan --all-namespaces
 ```
