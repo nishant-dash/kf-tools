@@ -3,7 +3,7 @@ kf='kubectl -n kubeflow'
 # function for fuzzy finding pods
 function kp {
   pattern="${@:-.}"
-  kf get po | grep -iE $pattern | fzf
+  kf get po | grep -iE $pattern | fzf --preview='tail -n 50 {}'
 }
 # function for viewing logs with specified tool (default uses less)
 # example: kpl less, kpl view, kpl less +G, etc...
