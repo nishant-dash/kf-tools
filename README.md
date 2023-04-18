@@ -1,6 +1,6 @@
 
 # kf-tools
-### A collection of handy tools for operators of kubeflow environments
+### A collection of handy wrapper tools for operators of kubeflow environments
 
 
 With kf-tools you have access to a few command line tools to help you operate your kubeflow deployment. These include:
@@ -26,10 +26,19 @@ cd kf-tools/ && python3 setup.py install
 ./install.sh
 ```
 
+### Install from pip
+#### Note, since these are wrapper scripts
+#### they use commands like juju, kubectl, fzf and trivy
+#### all of these are in install.sh (except juju and kubectl)
+
+```bash
+pip install kft
+```
+
 ### Install from snap (WIP)
 
 ```bash
-sudo snap install kf-tools
+sudo snap install kft
 ```
 
 ## Usage

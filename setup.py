@@ -15,7 +15,7 @@ setup(
     author = 'Nishant Dash',
     author_email = 'nishant.dash@canonical.com',
     license = kft_license,
-    description = 'A collection of handy tools for operators of kubeflow environments',
+    description = 'A collection of handy wrapper tools for operators of kubeflow environments',
     long_description = readme,
     long_description_content_type = "text/markdown",
     url = 'https://github.com/nishant-dash/kf-tools',

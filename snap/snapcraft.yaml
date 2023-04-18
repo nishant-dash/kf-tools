@@ -1,7 +1,7 @@
 name: kft
 base: core20
 adopt-info: kft
-summary: A collection of handy tools for operators of kubeflow environments
+summary: A collection of handy wrapper tools for operators of kubeflow environments
 description: |
   With kf-tools you have access to a few command line tools to help you operate 
   your kubeflow deployment such as viewing pod logs, checking versions and

@@ -8,7 +8,7 @@ import os
 @click.version_option()
 def cli():
     '''
-    A collection of handy tools for operators of kubeflow environments
+    A collection of handy wrapper tools for operators of kubeflow environments
     '''
     pass
 
