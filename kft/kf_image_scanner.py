@@ -8,6 +8,7 @@ from uuid import uuid4 as uid
 import json
 import yaml
 from termcolor import colored
+import pty
 
 
 class kvs:
@@ -34,14 +35,17 @@ class kvs:
             print(f"Scanning for {i}")
             cmd = [self.trivy, "image", "--scanners", "vuln", "-f", "json", i, "--output", op_file]
             sp.run(cmd, stderr=sp.DEVNULL)
+            if self.watch:
+                cmd = [self.trivy, "image", "--scanners", "vuln", i]
+                cmd = " ".join(cmd)
+                sp.run(f"SYSTEMD_COLORS=1 {cmd}", shell=True)
             trivy_info = None
             with open(op_file, "r") as f:
                 try:
                     trivy_info = json.load(f)
                 except json.JSONDecodeError as error:
                     print(f"Trouble get json {error}, you probably hit your docker rate limit")
-            cmd = ["rm", op_file]
-            sp.run(cmd)
+            sp.run(["rm", op_file])
 
             # structure output
             if trivy_info:
@@ -53,9 +57,6 @@ class kvs:
                             "cve_primary_url": vulns["PrimaryURL"],
                             "severity": vulns["Severity"],
                         })
-                    if self.watch:
-                        for item in self.all_info[i]:
-                            self.pprint(item)
 
 
     def load_file(self, file):

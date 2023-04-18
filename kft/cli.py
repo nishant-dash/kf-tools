@@ -192,7 +192,8 @@ def kvs_main(image, file, formatting, output, watch):
         kvs_obj.scan([image])
     if file:
         images_list = kvs_obj.load_file(file)
-        kvs_obj.scan(images_list)
+        if images_list:
+            kvs_obj.scan(images_list)
     kvs_obj.print_report()
 
 
