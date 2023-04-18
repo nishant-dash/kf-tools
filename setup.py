@@ -25,7 +25,7 @@ setup(
     python_requires='>=3.7',
     classifiers=[
         "Programming Language :: Python :: 3.8",
-        "Kubeflow Operator Tools :: Pyhton"
+        "Kubeflow Operator Tools :: Python"
     ],
     entry_points = '''
         [console_scripts]
