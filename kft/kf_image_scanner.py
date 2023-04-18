@@ -28,24 +28,19 @@ class kvs:
 
 
     def scan(self, images):
-        op_file = f".trivy-scan-{uid()}.out"
         for i in images:
-            cmd = ["touch", op_file]
-            sp.run(cmd)
             print(f"Scanning for {i}")
-            cmd = [self.trivy, "image", "--scanners", "vuln", "-f", "json", i, "--output", op_file]
-            sp.run(cmd, stderr=sp.DEVNULL)
+            cmd = [self.trivy, "image", "--scanners", "vuln", "-f", "json", i]
+            output = sp.run(cmd, stdout=sp.PIPE, stderr=sp.DEVNULL)
             if self.watch:
                 cmd = [self.trivy, "image", "--scanners", "vuln", i]
                 cmd = " ".join(cmd)
                 sp.run(f"SYSTEMD_COLORS=1 {cmd}", shell=True)
             trivy_info = None
-            with open(op_file, "r") as f:
-                try:
-                    trivy_info = json.load(f)
-                except json.JSONDecodeError as error:
-                    print(f"Trouble get json {error}, you probably hit your docker rate limit")
-            sp.run(["rm", op_file])
+            try:
+                trivy_info = json.load(output.stdout)
+            except json.JSONDecodeError as error:
+                print(f"Trouble get json {error}, you probably hit your docker rate limit")
 
             # structure output
             if trivy_info:
