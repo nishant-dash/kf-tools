@@ -8,8 +8,9 @@ description: |
   deltas of revision, and scanning for CVEs against pod images.
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict
 
 parts:
   kft:
     plugin: python
+    source: .
