@@ -4,9 +4,6 @@ def readf(file):
     with open(file, "r", encoding="utf-8") as f:
         return f.read()
 
-with open("requirements.txt", "r", encoding="utf-8") as f:
-    reqs = f.read()
-
 setup(
     name = 'kft',
     version = '0.0.2',
