@@ -9,7 +9,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 
 setup(
     name = 'kft',
-    version = '0.0.1',
+    version = '0.0.2',
     author = 'Nishant Dash',
     author_email = 'nishant.dash@canonical.com',
     license = readf("LICENSE"),
@@ -18,7 +18,14 @@ setup(
     long_description_content_type = "text/markdown",
     url = 'https://github.com/nishant-dash/kf-tools',
     packages = find_packages(),
-    install_requires = [reqs],
+    install_requires = [
+        "pyyaml",
+        "click",
+        "requests",
+        "tabulate",
+        "termcolor",
+        "tqdm",
+    ],
     python_requires='>=3.7',
     entry_points = '''
         [console_scripts]
