@@ -18,6 +18,7 @@ parts:
         snapcraftctl build
         echo "Version: $(python3 setup.py --version)"
         snapcraftctl set-version "$(python3 setup.py --version)"
+#        ./install.sh
 
 apps:
   kft:
