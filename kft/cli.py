@@ -32,7 +32,7 @@ def kpl_main(args):
         print("Only accept one argument, can be quoted to provide a full bash command with flags")
     else:
         args = str(args[0]) if len(args) == 1 else ""
-        executable = os.path.join(os.getcwd(), "kpl.sh")
+        executable = os.path.join(os.getcwd(), "kft/kpl.sh")
         cmd = f"{executable} {args}"
         print(cmd)
         sp.run(cmd, shell=True)
