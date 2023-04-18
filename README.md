@@ -18,7 +18,15 @@ This scanner uses [trivy](https://github.com/aquasecurity/trivy) to help you sca
 
 ## Installation
 
-Install my-project with npm
+### Install from source
+
+```bash
+git clone git@github.com:nishant-dash/kf-tools.git
+cd kf-tools/ && python3 setup.py install
+./install.sh
+```
+
+### Install from snap (WIP)
 
 ```bash
 sudo snap install kf-tools
