@@ -9,7 +9,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 
 setup(
     name = 'kft',
-    version = '0.1.3',
+    version = '0.0.1',
     author = 'Nishant Dash',
     author_email = 'nishant.dash@canonical.com',
     license = readf("LICENSE"),
