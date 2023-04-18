@@ -27,9 +27,8 @@ cd kf-tools/ && python3 setup.py install
 ```
 
 ### Install from pip
-#### Note, since these are wrapper scripts
-#### they use commands like juju, kubectl, fzf and trivy
-#### all of these are in install.sh (except juju and kubectl)
+**Note, since these are wrapper scripts they use commands like juju, kubectl, fzf and trivy
+all of these are in install.sh (except juju and kubectl)**
 
 ```bash
 pip install kft
