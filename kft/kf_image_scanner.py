@@ -38,7 +38,7 @@ class kvs:
                 sp.run(f"SYSTEMD_COLORS=1 {cmd}", shell=True)
             trivy_info = None
             try:
-                trivy_info = json.load(output.stdout)
+                trivy_info = json.loads(output.stdout)
             except json.JSONDecodeError as error:
                 print(f"Trouble get json {error}, you probably hit your docker rate limit")
 
