@@ -190,7 +190,6 @@ class kup:
             # get the juju info as yaml
             cmd = [self.juju, "info", info["charm_name"], "--format", "json"]
             output = sp.run(cmd, stdout=sp.PIPE, stderr=sp.DEVNULL)
-            print(output.stdout)
             # parse yaml for what we need
             juju_info = ""
             try:
