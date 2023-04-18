@@ -11,7 +11,7 @@ with open("LICENSE", "r", encoding="utf-8") as f:
 
 setup(
     name = 'kft',
-    version = '0.1',
+    version = '0.1.1',
     author = 'Nishant Dash',
     author_email = 'nishant.dash@canonical.com',
     license = kft_license,
