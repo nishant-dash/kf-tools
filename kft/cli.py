@@ -5,6 +5,7 @@ import subprocess as sp
 import os
 
 @click.group()
+@click.version_option()
 def cli():
     '''
     A collection of handy tools for operators of kubeflow environments
