@@ -26,6 +26,6 @@ setup(
     ],
     entry_points = '''
         [console_scripts]
-        kft=cli:cli
+        kft=kft.cli:cli
     '''
 )
