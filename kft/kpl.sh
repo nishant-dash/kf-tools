@@ -1,5 +1,5 @@
 #!/bin/bash
-kf='kubectl -n kubeflow'
+kf='/snap/bin/kubectl -n kubeflow'
 # function for fuzzy finding pods
 function kp {
   pattern="${@:-.}"

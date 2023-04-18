@@ -13,7 +13,7 @@ import pty
 
 class kvs:
     def __init__(self, format, output, watch):
-        self.trivy = "trivy"
+        self.trivy = "/snap/bin/trivy"
         self.all_info = {}
         self.color_map = {
             "critical": "red",
