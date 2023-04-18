@@ -1,6 +1,6 @@
 import click
-from kf_upgrade_planner import kup as kup
-from kf_image_scanner import kvs
+from kft.kf_upgrade_planner import kup
+from kft.kf_image_scanner import kvs
 import subprocess as sp
 import os
 
