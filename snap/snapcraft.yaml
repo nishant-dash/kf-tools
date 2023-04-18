@@ -1,6 +1,6 @@
 name: kft
 base: core20
-version: '0.1'
+adopt-info: kft
 summary: A collection of handy tools for operators of kubeflow environments
 description: |
   With kf-tools you have access to a few command line tools to help you operate 
@@ -14,7 +14,14 @@ parts:
   kft:
     plugin: python
     source: .
+    override-build: |
+        snapcraftctl build
+        echo "Version: $(python3 setup.py --version)"
+        snapcraftctl set-version "$(python3 setup.py --version)"
 
 apps:
   kft:
     command: bin/kft
+    plugs:
+      - network-bind
+      - home
