@@ -34,7 +34,6 @@ def kpl_main(args):
         args = str(args[0]) if len(args) == 1 else ""
         executable = os.path.join(os.getcwd(), "kft/kpl.sh")
         cmd = f"{executable} {args}"
-        print(cmd)
         sp.run(cmd, shell=True)
     return
 
