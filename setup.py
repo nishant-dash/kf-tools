@@ -1,27 +1,21 @@
 from setuptools import setup, find_packages 
 
-with open("README.md", "r", encoding="utf-8") as f:
-    readme = f.read()
-
-with open("requirements.txt", "r", encoding="utf-8") as f:
-    requirements = f.read()
-
-with open("LICENSE", "r", encoding="utf-8") as f:
-    kft_license = f.read()
+def readf(file):
+    with open(file, "r", encoding="utf-8") as f:
+        return f.read()
 
 setup(
     name = 'kft',
-    version = '0.1.1',
+    version = '0.1.2',
     author = 'Nishant Dash',
     author_email = 'nishant.dash@canonical.com',
-    license = kft_license,
+    license = readf("LICENSE"),
     description = 'A collection of handy wrapper tools for operators of kubeflow environments',
-    long_description = readme,
+    long_description = readf("README.md"),
     long_description_content_type = "text/markdown",
     url = 'https://github.com/nishant-dash/kf-tools',
-    py_modules = ['kft'],
     packages = find_packages(),
-    install_requires = [requirements],
+    install_requires = [readf("requirements.txt")],
     python_requires='>=3.7',
     entry_points = '''
         [console_scripts]
