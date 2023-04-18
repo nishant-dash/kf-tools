@@ -23,7 +23,7 @@ class kup:
         self.upgrade_docs = f"{self.kf_source}/tree/main/docs"
         self.anchor_app = "kubeflow-dashboard"
         self.index = {"beta": 0, "stable": 1, "edge": 2}
-        self.juju = "/snap/bin/juju"
+        self.juju = "juju"
         self.output_formats = ["yaml", "json", "csv"]
         for k,v in kwargs.items():
             setattr(self, k, v)
@@ -184,38 +184,24 @@ class kup:
         # before we can return target bundle, we need to get revision numbers from
         # charmhub. Currently, the kf bundle in the git repo does not include such
         # information.
-        if not os.path.exists(self.juju):
-            print("Can't find juju snap! Need that to query charmhub")
-            return None
-
         print("Getting revision numbers from charmhub via local juju tool...")
         # for each charm, check with juju info to see what revision you get
         for charm, info in tqdm(bundle.items()):
-            # temp file for the bundle
-            temp_file = f"/tmp/temp-{charm}-info-{uid()}.yaml"
             # get the juju info as yaml
-            cmd = [self.juju, "info", info["charm_name"], "--format", "yaml", "-o", temp_file]
-            sp.run(cmd, stderr=sp.DEVNULL)
-            # print(" ". join(cmd))
+            cmd = [self.juju, "info", info["charm_name"], "--format", "json"]
+            output = sp.run(cmd, stdout=sp.PIPE, stderr=sp.DEVNULL)
+            print(output.stdout)
             # parse yaml for what we need
             juju_info = ""
-            with open(temp_file, "r") as f:
-                try:
-                    juju_info = yaml.safe_load(f)
-                except yaml.YAMLError as error:
-                    print(error)
-            # print(charm)
-            # print(bundle[charm])
-            # print(juju_info["channel-map"].keys())
+            try:
+                juju_info = json.loads(output.stdout)
+            except json.JSONDecodeError as error:
+                print(error)
             channels = juju_info["channel-map"]
             if info["channel"] not in channels:
                 bundle[charm]["revision"] = "Error"
             else:    
                 bundle[charm]["revision"] = channels[info["channel"]]["revision"]
-            # print(bundle[charm])
-            # remove temp file
-            cmd = ["rm", temp_file]
-            sp.run(cmd)
 
     # load target kubeflow bundle from github for comparison
     def download_bundle(self):

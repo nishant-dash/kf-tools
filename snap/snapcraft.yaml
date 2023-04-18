@@ -8,7 +8,7 @@ description: |
   deltas of revision, and scanning for CVEs against pod images.
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode
+confinement: strict
 
 parts:
   kft:
@@ -18,7 +18,11 @@ parts:
         snapcraftctl build
         echo "Version: $(python3 setup.py --version)"
         snapcraftctl set-version "$(python3 setup.py --version)"
-#        ./install.sh
+      #  ./install.sh
+    stage-snaps:
+      - juju/2.9/stable
+    stage-packages:
+      - fzf
 
 apps:
   kft:
