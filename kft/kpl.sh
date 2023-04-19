@@ -3,7 +3,8 @@ kf='/snap/bin/kubectl -n kubeflow'
 # function for fuzzy finding pods
 function kp {
   pattern="${@:-.}"
-  kf get po | grep -iE $pattern | fzf --preview='tail -n 50 {}' --bind shift-up:preview-page-up,shift-down:preview-page-down
+  #kf get po | grep -iE $pattern | fzf --preview='tail -n 50 {}' --bind shift-up:preview-page-up,shift-down:preview-page-down
+  kf get po | grep -iE $pattern | fzf --preview='echo {} | cut -d " " -f1 | xargs kubectl -n kubeflow --tail=100 logs' --bind shift-up:preview-page-up,shift-down:preview-page-down --preview-window wrap
 }
 # function for viewing logs with specified tool (default uses less)
 # example: kpl less, kpl view, kpl less +G, etc...
